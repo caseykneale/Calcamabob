@@ -1,0 +1,16 @@
+[package]
+name = "calcamabob"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[[bin]]
+name = "calcamabob"
+test = true
+bench = false
+
+[dependencies]
+logos = "0.12.1"
+anyhow = "1.0.58"
+clap = { version = "3.2.6", features = ["derive"] }
