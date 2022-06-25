@@ -13,6 +13,14 @@ pub fn interpreter(ast: Expression) -> Result<f64> {
         Expression::Numeric(z) => Ok(z),
         Expression::LeftUnary(z, expr) => {
             match z.as_str() {
+                "radian(" => Ok(interpreter(*expr)?.to_radians()),
+                "degrees(" => Ok(interpreter(*expr)?.to_degrees()),
+                "round(" => Ok(interpreter(*expr)?.round()),
+                "trunc(" => Ok(interpreter(*expr)?.trunc()),
+                "abs(" => Ok(interpreter(*expr)?.abs()),
+                "ln(" => Ok(interpreter(*expr)?.ln()),
+                "log10(" => Ok(interpreter(*expr)?.log10()),
+                "log2(" => Ok(interpreter(*expr)?.log2()), 
                 "sqrt(" => Ok(interpreter(*expr)?.sqrt()),
                 "asin(" => Ok(interpreter(*expr)?.asin()),
                 "acos(" => Ok(interpreter(*expr)?.acos()),
@@ -20,6 +28,9 @@ pub fn interpreter(ast: Expression) -> Result<f64> {
                 "sin(" => Ok(interpreter(*expr)?.sin()),
                 "cos(" => Ok(interpreter(*expr)?.cos()),
                 "tan(" => Ok(interpreter(*expr)?.tan()),
+                "sinh(" => Ok(interpreter(*expr)?.sinh()),
+                "cosh(" => Ok(interpreter(*expr)?.cosh()),
+                "tanh(" => Ok(interpreter(*expr)?.tanh()),
                 _ => Err(anyhow!("Prefix unary operator {:?} not avaialble.", z)),
             }
         }

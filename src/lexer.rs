@@ -11,15 +11,29 @@ use logos::Logos;
 pub fn from_logos(lexer: &mut logos::Lexer<Token>) -> (Vec<Token>, Vec<String>) {
     let mut lexer_tokens:Vec<Token> = Vec::new();
     let mut lexer_slices:Vec<String> = Vec::new();
+    let mut last_valid_token: Token = Token::Error;
+    // let mut last_valid_slice: String = "".to_owned();
     loop {
         match lexer.next(){
             Some(Token::Error) => {continue;},
             Some(x) => {
-                lexer_tokens.push(x);
+                match (&last_valid_token, &x ) {
+                    (Token::Numeric(_),Token::Numeric(b)) => {
+                        if *b < 0.0 {
+                            lexer_tokens.push(Token::Plus);
+                            lexer_slices.push("+".to_owned());
+                        }
+                    },
+                    _ => {}
+                }
+                lexer_tokens.push(x.clone());
                 lexer_slices.push(lexer.slice().to_owned());
+                last_valid_token = x;
             },
             None => {break;},
-        } 
+        }
+
+    
     };
  
     (lexer_tokens, lexer_slices)
@@ -35,9 +49,9 @@ pub enum Expression {
 
 #[derive(Logos, Debug, PartialEq, Clone)]
 pub enum Token {
-    #[token("+")]
+    #[token("+", priority = 2)]
     Plus,
-    #[token("-")]
+    #[token("-", priority = 2)]
     Minus,
     #[token("/")]
     Divide,
@@ -55,9 +69,12 @@ pub enum Token {
     EulersConstant(f64),
     #[token("=")]
     Equals,
+
     #[regex(r"[a-zA-Z]+\(", priority = 10)]
+    #[regex(r"([a-zA-Z]+)?([0-9]+)\(", priority = 10)] //Allow for log10()
     FunctionCall,
-    #[regex("([0-9]*[.])?[0-9]+", |lex| lex.slice().parse::<f64>().unwrap())]
+
+    #[regex("[-]?([0-9]*[.])?[0-9]+", |lex| lex.slice().parse::<f64>().unwrap(), priority = 1)]
     Numeric(f64),
 
     #[error]
