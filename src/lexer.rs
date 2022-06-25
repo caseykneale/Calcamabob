@@ -57,9 +57,9 @@ pub enum Token {
     #[token("=")]
     Equals,
 
-    // #[regex(r"-(", priority = 10)]
     #[regex(r"[a-zA-Z]+\(", priority = 10)]
-    #[regex(r"([a-zA-Z]+)?([0-9]+)\(", priority = 10)] //Allow for log10()
+    //Allow for log10(), log2(), etc.
+    #[regex(r"([a-zA-Z]+)?([0-9]+)\(", priority = 10)] 
     FunctionCall,
 
     // Allow for positive numeric literals only

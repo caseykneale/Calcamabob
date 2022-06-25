@@ -24,7 +24,6 @@ struct CliArgs {
 fn calculate(corpus: String) -> Result<f64> {
     let mut lexer = Token::lexer(&corpus);
     let (tokens, slices) = from_logos(&mut lexer);
-    println!("{:?}",tokens);
     let mut parser = lexer::Parser::new(tokens.iter(), slices.iter());
     let ast = parser.expression(0)?;
     interpreter(ast)
