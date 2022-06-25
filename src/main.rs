@@ -26,7 +26,7 @@ fn calculate(corpus: String) -> Result<f64> {
     let (tokens, slices) = from_logos(&mut lexer);
     let mut parser = lexer::Parser::new(tokens.iter(), slices.iter());
     let ast = parser.expression(0)?;
-    Ok(interpreter(ast))
+    interpreter(ast)
 }
 
 fn main() {
