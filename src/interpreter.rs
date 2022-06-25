@@ -5,11 +5,17 @@ use crate::lexer::*;
 /// # Arguments
 ///
 /// * `ast` - An abstract binary syntax tree generated from the parser.
+/// 
+/// ToDo: Consider returning Result<f64>.
 pub fn interpreter(ast: Expression) -> f64 {
     match ast {
         Expression::Numeric(z) => z,
         Expression::LeftUnary(z, expr) => {
             match z.as_str() {
+                "sqrt(" => interpreter(*expr).sqrt(),
+                "asin(" => interpreter(*expr).asin(),
+                "acos(" => interpreter(*expr).acos(),
+                "atan(" => interpreter(*expr).atan(),
                 "sin(" => interpreter(*expr).sin(),
                 "cos(" => interpreter(*expr).cos(),
                 "tan(" => interpreter(*expr).tan(),

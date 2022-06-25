@@ -8,7 +8,8 @@
 Make the binary and execute it with the `eqn` command line argument followed by an expression, like so:
 
 ```sh
-calcamabob -eqn sin(pi)^2
+calcamabob --eqn="sin(pi)^2"
+calcamabob --eqn="2+3*4"
 ```
 
 ### Motivation
