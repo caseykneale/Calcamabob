@@ -18,6 +18,7 @@ pub fn from_logos(lexer: &mut logos::Lexer<Token>) -> (Vec<Token>, Vec<String>) 
             Some(Token::Error) => {continue;},
             Some(x) => {
                 match (&last_valid_token, &x ) {
+                    //Dissambiguate +/-#literal from #literal +/- #literal
                     (Token::Numeric(_),Token::Numeric(b)) => {
                         if *b < 0.0 {
                             lexer_tokens.push(Token::Plus);
@@ -70,10 +71,14 @@ pub enum Token {
     #[token("=")]
     Equals,
 
+    #[regex(r"-\(", priority = 10)]
     #[regex(r"[a-zA-Z]+\(", priority = 10)]
     #[regex(r"([a-zA-Z]+)?([0-9]+)\(", priority = 10)] //Allow for log10()
     FunctionCall,
-
+    
+    // Allow for - numeric literals only, as + is the default.
+    // We handle -(...) as a Unary function operator.
+    // We dissambiguate +/-#Literals from infix +/- in the `from_logos` function.
     #[regex("[-]?([0-9]*[.])?[0-9]+", |lex| lex.slice().parse::<f64>().unwrap(), priority = 1)]
     Numeric(f64),
 
