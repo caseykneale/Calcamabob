@@ -1,5 +1,10 @@
 use crate::lexer::*;
 
+/// Returns the numerical result from the parsed AST.
+/// 
+/// # Arguments
+///
+/// * `ast` - An abstract binary syntax tree generated from the parser.
 pub fn interpreter(ast: Expression) -> f64 {
     match ast {
         Expression::Numeric(z) => z,

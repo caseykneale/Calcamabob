@@ -15,6 +15,12 @@ struct CliArgs {
     eqn: String,
 }
 
+/// Lexes, parses, and interprets the numerical result(if successful)
+/// of an input string.
+/// 
+/// # Arguments
+///
+/// * `corpus` - Some String containing text to be evaluated.
 fn calculate(corpus: String) -> Result<f64> {
     let mut lexer = Token::lexer(&corpus);
     let (tokens, slices) = from_logos(&mut lexer);
@@ -34,7 +40,7 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn interpretted_results() {
         assert_eq!(calculate("(2+5*2)^2".to_owned()).unwrap(), 144.0);

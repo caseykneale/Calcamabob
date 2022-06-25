@@ -2,6 +2,12 @@ use std::{slice::Iter, iter::Peekable};
 use anyhow::{Result, anyhow};
 use logos::Logos;
 
+/// Returns a 2-tuple of the tokens, and Strings in a body of text as
+/// they can be interpretted by Calcamabob.
+/// 
+/// # Arguments
+///
+/// * `lexer` - a mutable reference to a Logos Lexer
 pub fn from_logos(lexer: &mut logos::Lexer<Token>) -> (Vec<Token>, Vec<String>) {
     let mut lexer_tokens:Vec<Token> = Vec::new();
     let mut lexer_slices:Vec<String> = Vec::new();
@@ -60,6 +66,9 @@ pub enum Token {
 }
 
 impl Token {
+    /// Returns true if a token is an infix operator, false
+    /// if not.
+    /// 
     fn is_infix(&self) -> bool{
         match *self {
             Token::Plus => true,
@@ -71,6 +80,9 @@ impl Token {
         }
     }
 
+    /// In the Pratt sense, calculates the left binding power 
+    /// of this token.
+    /// 
     fn left_binding_power(&self) -> u32 {
         match *self {
             Token::Plus => 10,
@@ -85,6 +97,9 @@ impl Token {
         }
     }
     
+    /// Returns the expression (if it is valid) from a null 
+    /// denotion token.
+    /// 
     fn null_denotion(&self) -> Result<Expression> {
         match *self {
             Token::Numeric(f) => Ok(Expression::Numeric(f)),
@@ -94,6 +109,9 @@ impl Token {
 	    }
     }
 
+    /// Returns the expression (if it is valid) from a left 
+    /// denotion token.
+    /// 
     fn left_denotion(&self, parser: &mut Parser, lhs: Expression) -> Result<Expression> {
         if self.is_infix() {
             let rhs = parser.expression(self.left_binding_power())?;
@@ -116,10 +134,21 @@ impl<'a> Parser<'a> {
         self.slices.next();
     }
 
+    /// Create a new Parser from streams of Tokens, and Strings.
+    /// 
+    /// # Arguments
+    ///
+    /// * `tokens` - an iterable token stream, probably from Logos.
+    /// * `slices` - an iterable stream of token strings, probably from Logos.
     pub fn new(tokens: Iter<'a, Token>, slices: Iter<'a, String>) -> Self {
         Parser{ tokens: tokens.peekable(), slices: slices.peekable() }
     }
 
+    /// Pratt parser
+    /// 
+    /// # Arguments
+    ///
+    /// * `rbp` - right binding power of the expression. Initialize with 0.
     pub fn expression(&mut self, rbp: u32) -> Result<Expression> {
         let mut was_paren = false;
         let mut left:Expression = match self.tokens.peek(){
@@ -187,7 +216,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn no_parens_arithmatic() {
+    fn no_parens_arithmetic() {
         let mut lexer = Token::lexer("pi*3+2");
         let (tokens, slices) = from_logos(&mut lexer);
         let mut parser = Parser::new(tokens.iter(), slices.iter());
