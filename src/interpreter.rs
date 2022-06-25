@@ -13,7 +13,7 @@ pub fn interpreter(ast: Expression) -> Result<f64> {
         Expression::Numeric(z) => Ok(z),
         Expression::LeftUnary(z, expr) => {
             match z.as_str() {
-                "-(" => Ok(interpreter(*expr)? * -1.),
+                "-" => Ok(-interpreter(*expr)?),
                 "radian(" => Ok(interpreter(*expr)?.to_radians()),
                 "degrees(" => Ok(interpreter(*expr)?.to_degrees()),
                 "round(" => Ok(interpreter(*expr)?.round()),

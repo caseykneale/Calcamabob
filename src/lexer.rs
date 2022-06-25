@@ -11,30 +11,16 @@ use logos::Logos;
 pub fn from_logos(lexer: &mut logos::Lexer<Token>) -> (Vec<Token>, Vec<String>) {
     let mut lexer_tokens:Vec<Token> = Vec::new();
     let mut lexer_slices:Vec<String> = Vec::new();
-    let mut last_valid_token: Token = Token::Error;
-    // let mut last_valid_slice: String = "".to_owned();
+    
     loop {
         match lexer.next(){
             Some(Token::Error) => {continue;},
             Some(x) => {
-                match (&last_valid_token, &x ) {
-                    //Dissambiguate +/-#literal from #literal +/- #literal
-                    (Token::Numeric(_),Token::Numeric(b)) => {
-                        if *b < 0.0 {
-                            lexer_tokens.push(Token::Plus);
-                            lexer_slices.push("+".to_owned());
-                        }
-                    },
-                    _ => {}
-                }
                 lexer_tokens.push(x.clone());
                 lexer_slices.push(lexer.slice().to_owned());
-                last_valid_token = x;
             },
             None => {break;},
         }
-
-    
     };
  
     (lexer_tokens, lexer_slices)
@@ -52,7 +38,7 @@ pub enum Expression {
 pub enum Token {
     #[token("+", priority = 2)]
     Plus,
-    #[token("-", priority = 2)]
+    #[token("-", priority = 16)]
     Minus,
     #[token("/")]
     Divide,
@@ -71,15 +57,13 @@ pub enum Token {
     #[token("=")]
     Equals,
 
-    #[regex(r"-\(", priority = 10)]
+    // #[regex(r"-(", priority = 10)]
     #[regex(r"[a-zA-Z]+\(", priority = 10)]
     #[regex(r"([a-zA-Z]+)?([0-9]+)\(", priority = 10)] //Allow for log10()
     FunctionCall,
-    
-    // Allow for - numeric literals only, as + is the default.
-    // We handle -(...) as a Unary function operator.
-    // We dissambiguate +/-#Literals from infix +/- in the `from_logos` function.
-    #[regex("[-]?([0-9]*[.])?[0-9]+", |lex| lex.slice().parse::<f64>().unwrap(), priority = 1)]
+
+    // Allow for positive numeric literals only
+    #[regex("([0-9]*[.])?[0-9]+", |lex| lex.slice().parse::<f64>().unwrap(), priority = 1)]
     Numeric(f64),
 
     #[error]
@@ -88,8 +72,7 @@ pub enum Token {
 }
 
 impl Token {
-    /// Returns true if a token is an infix operator, false
-    /// if not.
+    /// Returns true if a token is an infix operator, false if not.
     /// 
     fn is_infix(&self) -> bool{
         match *self {
@@ -102,8 +85,7 @@ impl Token {
         }
     }
 
-    /// In the Pratt sense, calculates the left binding power 
-    /// of this token.
+    /// In the Pratt sense, calculates the left binding power of this token.
     /// 
     fn left_binding_power(&self) -> u32 {
         match *self {
@@ -119,8 +101,7 @@ impl Token {
         }
     }
     
-    /// Returns the expression (if it is valid) from a null 
-    /// denotion token.
+    /// Returns the expression (if it is valid) from a null denotion token.
     /// 
     fn null_denotion(&self) -> Result<Expression> {
         match *self {
@@ -131,8 +112,7 @@ impl Token {
 	    }
     }
 
-    /// Returns the expression (if it is valid) from a left 
-    /// denotion token.
+    /// Returns the expression (if it is valid) from a left denotion token.
     /// 
     fn left_denotion(&self, parser: &mut Parser, lhs: Expression) -> Result<Expression> {
         if self.is_infix() {
@@ -174,6 +154,10 @@ impl<'a> Parser<'a> {
     pub fn expression(&mut self, rbp: u32) -> Result<Expression> {
         let mut was_paren = false;
         let mut left:Expression = match self.tokens.peek(){
+            Some(Token::Minus) => {
+                self.next();
+                Expression::LeftUnary("-".to_owned(), Box::new(self.expression(0)?))
+            },
             Some(Token::FunctionCall) => {
                 match self.slices.next() {
                     Some(x) => {

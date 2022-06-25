@@ -48,5 +48,10 @@ mod tests {
         assert_eq!(calculate("2+5*2^2".to_owned()).unwrap(), 22.0);
         assert_eq!(calculate("cos(pi)".to_owned()).unwrap(), -1.);
         assert_eq!(calculate("sin(0)".to_owned()).unwrap(), 0.);
+        assert_eq!(calculate("-(5+-4)".to_owned()).unwrap(), -1.);
+        assert_eq!(calculate("-cos(pi)".to_owned()).unwrap(), 1.);
+        assert_eq!(calculate("log10(100.0)".to_owned()).unwrap(), 2.);
+        assert_eq!(calculate("round(2/3)".to_owned()).unwrap(), 1.);
+        assert_eq!(calculate("round(-1/4)".to_owned()).unwrap(), 0.);
     }
 }
