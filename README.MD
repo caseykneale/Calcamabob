@@ -13,3 +13,6 @@ calcamabob -eqn sin(pi)^2
 
 ### Motivation
 I never tried to make a programming language before, so a calculator is a good excercise to do that.
+
+### References:
+I needed help getting a Pratt parser started and found a good tutorial for it: https://willspeak.me/2016/09/03/top-down-operator-precedence-parsing-in-rust.html
