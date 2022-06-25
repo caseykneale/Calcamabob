@@ -10,9 +10,12 @@ use crate::interpreter::*;
 use clap::Parser;
 
 #[derive(clap::Parser, Debug)]
+#[clap(about, version, author)]
 struct CliArgs {
     #[clap(short, long, value_parser)]
-    eqn: String,
+    expression: Option<String>,
+    #[clap(short, long, value_parser)]
+    file: Option<String>,
 }
 
 /// Lexes, parses, and interprets the numerical result(if successful)
@@ -31,9 +34,23 @@ fn calculate(corpus: String) -> Result<f64> {
 
 fn main() {
     let args = CliArgs::parse();
-    match calculate(args.eqn){
+    let result = match (args.expression, args.file) {
+        (Some(expr), None) => calculate(expr),
+        (None, Some(file_path)) => {
+            let file_contents = std::fs::read_to_string(file_path)
+                .unwrap();
+            calculate(file_contents)
+        },
+        (Some(expr), Some(_)) => {
+            println!("Both a file designation and an expression were given to Calcamabob. \
+            Defaulting, to Expression, please correct your command line arguments.");
+            calculate(expr)
+        },
+        (None, None) => {calculate("0.".to_owned())}
+    };
+    match result{
         Ok(value) => println!("{:?}", value),
-        Err(e) => panic!("{}", e),
+        Err(error) => panic!("{}", error),
     }
 }
 

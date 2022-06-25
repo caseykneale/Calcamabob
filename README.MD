@@ -2,19 +2,22 @@
  - A command line calculator
  - Is written in Rust
  - Is not blazing fast, and could be faster.
- - Can do basic math and handles operator precedence
+ - Calcamabob can interpret operator precedence. For example: `calcamabob -e "2+3*4"` will return 14(`2+(3*4)`), and not 20(`(2+3)*4`).
 
 ### Usage
-Make the binary and execute it with the `eqn` command line argument followed by an expression, like so:
+Make the binary and execute it with the `expression` command line argument followed by an expression, like so:
 
 ```sh
-calcamabob --eqn="sin(pi)^2"
-calcamabob --eqn="2+3*4"
+calcamabob --expression "sin(pi)^2"
+calcamabob -e "2+3*4"
 ```
 
-Calcamabob can interpret operator precedence, for example:
-```calcamabob --eqn="2+3*4"```
-Will return 14(`2+(3*4)`), and not 20(`(2+3)*4`)
+Alternatively, provide a path to a file which contains an arithmetic expression inside of it and call the `file` command line argument.
+
+```sh
+calcamabob --file "/path/to/expression.txt"
+calcamabob -f "/path/to/expression.txt"
+```
 
 ### Motivation
 I never tried to make a programming language before, so a calculator is a good excercise to do that.
