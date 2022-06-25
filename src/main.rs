@@ -25,10 +25,13 @@ struct CliArgs {
 ///
 /// * `corpus` - Some String containing text to be evaluated.
 fn calculate(corpus: String) -> Result<f64> {
+    println!("---\n");
     let mut lexer = Token::lexer(&corpus);
     let (tokens, slices) = from_logos(&mut lexer);
+    println!("{:?}", tokens);
     let mut parser = lexer::Parser::new(tokens.iter(), slices.iter());
     let ast = parser.expression(0)?;
+    println!("{:?}", ast);
     interpreter(ast)
 }
 
@@ -65,9 +68,15 @@ mod tests {
         assert_eq!(calculate("cos(pi)".to_owned()).unwrap(), -1.);
         assert_eq!(calculate("sin(0)".to_owned()).unwrap(), 0.);
         assert_eq!(calculate("-(5+-4)".to_owned()).unwrap(), -1.);
+        assert_eq!(calculate("-(5-4)".to_owned()).unwrap(), -1.);
+        assert_eq!(calculate("5*10-4*3".to_owned()).unwrap(), 38.);
+        assert_eq!(calculate("5*10-4*-3".to_owned()).unwrap(), 62.);
+        assert_eq!(calculate(" 5  * 10- 4*-  3".to_owned()).unwrap(), 62.);
         assert_eq!(calculate("-cos(pi)".to_owned()).unwrap(), 1.);
         assert_eq!(calculate("log10(100.0)".to_owned()).unwrap(), 2.);
         assert_eq!(calculate("round(2/3)".to_owned()).unwrap(), 1.);
         assert_eq!(calculate("round(-1/4)".to_owned()).unwrap(), 0.);
+        assert_eq!(calculate("-(tan(pi/4)*3)".to_owned()).unwrap().round(), -3.);
+        assert_eq!(calculate("-3 + 4.2/333".to_owned()).unwrap(), -2.9873873873873873873873873873873873873873873873873873873873873873);
     }
 }

@@ -24,3 +24,6 @@ I never tried to make a programming language before, so a calculator is a good e
 
 ### References:
 I needed help getting a Pratt parser started and found a good tutorial for it: https://willspeak.me/2016/09/03/top-down-operator-precedence-parsing-in-rust.html
+
+### Warning:
+This code hasn't be tested for every condition. Meaning, you might get an incorrect answer at some point.

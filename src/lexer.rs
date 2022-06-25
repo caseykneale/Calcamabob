@@ -156,7 +156,16 @@ impl<'a> Parser<'a> {
         let mut left:Expression = match self.tokens.peek(){
             Some(Token::Minus) => {
                 self.next();
-                Expression::LeftUnary("-".to_owned(), Box::new(self.expression(0)?))
+                match self.tokens.peek(){
+                    Some(Token::Numeric(x)) => {
+                        //Treat this as a NUD
+                        self.tokens.next();
+                        Expression::LeftUnary("-".to_owned(), Box::new(Expression::Numeric(*x)))
+                    },
+                    //Treat this as a LED
+                    _ => Expression::LeftUnary("-".to_owned(), Box::new(self.expression(0)?))
+                }
+
             },
             Some(Token::FunctionCall) => {
                 match self.slices.next() {
