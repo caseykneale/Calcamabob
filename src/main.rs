@@ -25,13 +25,10 @@ struct CliArgs {
 ///
 /// * `corpus` - Some String containing text to be evaluated.
 fn calculate(corpus: String) -> Result<f64> {
-    println!("---\n");
     let mut lexer = Token::lexer(&corpus);
     let (tokens, slices) = from_logos(&mut lexer);
-    println!("{:?}", tokens);
     let mut parser = lexer::Parser::new(tokens.iter(), slices.iter());
     let ast = parser.expression(0)?;
-    println!("{:?}", ast);
     interpreter(ast)
 }
 
